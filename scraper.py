@@ -24,6 +24,7 @@ except AttributeError:
 class Ui_MainWindow(object):
 
     checkState = False
+    fileData = ""
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
@@ -31,14 +32,23 @@ class Ui_MainWindow(object):
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
 
+        # URL LINEEDIT
         self.lineEdit = QtGui.QLineEdit(self.centralwidget)
         self.lineEdit.setGeometry(QtCore.QRect(20, 30, 391, 29))
         self.lineEdit.setObjectName(_fromUtf8("lineEdit"))
 
+        # SCRAPE BUTTON
         self.pushButton = QtGui.QPushButton(self.centralwidget)
         self.pushButton.setGeometry(QtCore.QRect(420, 30, 101, 29))
         self.pushButton.setObjectName(_fromUtf8("pushButton"))
         self.pushButton.clicked.connect(self.scrape)
+
+        # EXPORT BUTTON
+        self.exportButton = QtGui.QPushButton(self.centralwidget)
+        self.exportButton.setGeometry(QtCore.QRect(666, 216, 101, 29))
+        self.exportButton.setObjectName(_fromUtf8("exportButton"))
+        self.exportButton.setEnabled(self.checkState)
+        self.exportButton.clicked.connect(self.export_file)
 
         self.frame = QtGui.QFrame(self.centralwidget)
         self.frame.setGeometry(QtCore.QRect(20, 80, 501, 471))
@@ -53,6 +63,7 @@ class Ui_MainWindow(object):
         self.label.setStyleSheet(_fromUtf8(""))
         self.label.setAlignment(QtCore.Qt.AlignCenter)
         self.label.setObjectName(_fromUtf8("label"))
+
         # TAG
         self.lineEdit_2 = QtGui.QLineEdit(self.centralwidget)
         self.lineEdit_2.setGeometry(QtCore.QRect(540, 110, 71, 29))
@@ -69,11 +80,13 @@ class Ui_MainWindow(object):
         self.lineEdit_3.setGeometry(QtCore.QRect(650, 110, 113, 29))
         self.lineEdit_3.setObjectName(_fromUtf8("lineEdit_3"))
 
+        # EXPORT CHECKBOX
         self.checkBox = QtGui.QCheckBox(self.centralwidget)
         self.checkBox.setGeometry(QtCore.QRect(540, 220, 121, 22))
         self.checkBox.setObjectName(_fromUtf8("checkBox"))
         self.checkBox.clicked.connect(self.check_export)
 
+        # EXPORT LINEEDIT
         self.lineEdit_4 = QtGui.QLineEdit(self.centralwidget)
         self.lineEdit_4.setGeometry(QtCore.QRect(540, 180, 241, 29))
         self.lineEdit_4.setObjectName(_fromUtf8("lineEdit_4"))
@@ -98,6 +111,7 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow", None))
         self.lineEdit.setPlaceholderText(_translate("MainWindow", "Enter URL to scrape from", None))
         self.pushButton.setText(_translate("MainWindow", "Scrape", None))
+        self.exportButton.setText(_translate("MainWindow", "Export", None))
         self.label.setText(_translate("MainWindow", "PREVIEW", None))
         self.lineEdit_2.setToolTip(_translate("MainWindow", "Enter desired tag for scraping", None))
         self.lineEdit_2.setPlaceholderText(_translate("MainWindow", "Tag", None))
@@ -110,6 +124,7 @@ class Ui_MainWindow(object):
         self.lineEdit_4.setPlaceholderText(_translate("MainWindow", "Name of file", None))
         self.label_4.setText(_translate("MainWindow", "Filename:", None))
 
+    # SCRAPE FUNCTION
     def scrape(self):
         url = self.lineEdit.text()
         tag = self.lineEdit_2.text()
@@ -118,8 +133,6 @@ class Ui_MainWindow(object):
         data = r.text
         soup = bs(data, "html.parser")
 
-        #html = soup.getText().encode('utf-8')
-        #f = open('test.txt', 'a')
         self.textEdit.clear()
         if(self.lineEdit_3.text().isEmpty()):
             for link in soup.findAll(tag):
@@ -129,14 +142,24 @@ class Ui_MainWindow(object):
             for link in soup.findAll(tag, {"class": tag_class}):
                 linkText = unicode(link).encode('utf-8')
                 self.textEdit.append(linkText)
-            #f.write(linkText + "\n")
-        # f.close()
 
+    # SWITCH EXPORT ON/OFF
     def check_export(self):
         self.checkState = not self.checkState
         self.lineEdit_4.setEnabled(self.checkState)
+        self.exportButton.setEnabled(self.checkState)
+
+    # EXPORT FILE FUNCTION
+    def export_file(self):
+        fileName = self.lineEdit_4.text()
+        fileData = self.textEdit.toPlainText()
+        f = open(fileName, 'w')
+
+        f.write(fileData)
+        f.close()
 
 
+# MAIN CALL
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = QMainWindow()
