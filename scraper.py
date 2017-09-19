@@ -55,9 +55,13 @@ class Ui_MainWindow(object):
         self.frame.setFrameShape(QtGui.QFrame.StyledPanel)
         self.frame.setFrameShadow(QtGui.QFrame.Raised)
         self.frame.setObjectName(_fromUtf8("frame"))
+
+        # TEXTEDIT PREVIEW
         self.textEdit = QtGui.QTextEdit(self.frame)
         self.textEdit.setGeometry(QtCore.QRect(10, 50, 481, 411))
         self.textEdit.setObjectName(_fromUtf8("textEdit"))
+        self.textEdit.setReadOnly(True)
+
         self.label = QtGui.QLabel(self.frame)
         self.label.setGeometry(QtCore.QRect(27, 9, 461, 31))
         self.label.setStyleSheet(_fromUtf8(""))
@@ -76,6 +80,7 @@ class Ui_MainWindow(object):
         self.label_3.setGeometry(QtCore.QRect(655, 90, 101, 17))
         self.label_3.setObjectName(_fromUtf8("label_3"))
 
+        # CLASS LINEEDIT
         self.lineEdit_3 = QtGui.QLineEdit(self.centralwidget)
         self.lineEdit_3.setGeometry(QtCore.QRect(650, 110, 113, 29))
         self.lineEdit_3.setObjectName(_fromUtf8("lineEdit_3"))
@@ -127,7 +132,7 @@ class Ui_MainWindow(object):
     # SCRAPE FUNCTION
     def scrape(self):
         url = self.lineEdit.text()
-        tag = self.lineEdit_2.text()
+        tag = self.lineEdit_2.text().toLower()
         tag_class = self.lineEdit_3.text()
         r = requests.get("http://" + url)
         data = r.text
@@ -135,13 +140,13 @@ class Ui_MainWindow(object):
 
         self.textEdit.clear()
         if(self.lineEdit_3.text().isEmpty()):
-            for link in soup.findAll(tag):
-                linkText = unicode(link).encode('utf-8')
-                self.textEdit.append(linkText)
+            for line in soup.findAll(tag):
+                lineText = unicode(line).encode('utf-8')
+                self.textEdit.append(lineText)
         else:
-            for link in soup.findAll(tag, {"class": tag_class}):
-                linkText = unicode(link).encode('utf-8')
-                self.textEdit.append(linkText)
+            for line in soup.findAll(tag, {"class": tag_class}):
+                lineText = unicode(line).encode('utf-8')
+                self.textEdit.append(lineText + "\n")
 
     # SWITCH EXPORT ON/OFF
     def check_export(self):
